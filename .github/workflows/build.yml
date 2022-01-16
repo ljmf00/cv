@@ -1,0 +1,31 @@
+name: build
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  latex:
+    runs-on: ubuntu-latest
+    container: ljmf00/archlinux
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Install dependencies
+      run: |
+        pacman -Syy --needed --noconfirm --noprogressbar \
+          texlive-bin texlive-core texlive-latexextra texlive-fontsextra
+    - name: Build PDF
+      run: xelatex cv.tex
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: cv
+        path: cv.pdf
+        if-no-files-found: error
